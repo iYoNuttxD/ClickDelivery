@@ -41,17 +41,15 @@
 
 - **Server:** erp-delivery-sql-server.database.windows.net
 - **Database:** DeliveryServiceDB
-- **Username:** erpadmin
-- **Password:** YourStrong@Pass2024!
 
 ---
 
 ## 🍃 MongoDB Atlas
 
-- **Connection String:** mongodb+srv://ordersadmin:OrdersPass2024!@orders-cluster.cxzyl8z.mongodb.net/?appName=orders-cluster
+- **Connection String:** mongodb+srv://ordersadmin:<password>@orders-cluster.cxzyl8z.mongodb.net/?appName=orders-cluster
 - **Cluster:** orders-cluster
-- **Database:** ordersDB
 
 ---
+
 
 **Outubro/2025**
