@@ -34,11 +34,26 @@
 
 ## ⚡ Azure Functions
 
-- **CreateEvent:** https://erp-events-functions.azurewebsites.net/api/CreateEvent
+- **CreateEvent:** POST https://erp-events-functions.azurewebsites.net/api/CreateEvent
+
+### **JSON utilizado para teste**
+```json
+{
+  "type": "pedido_criado",
+  "data": {
+    "pedidoId": "12345",
+    "cliente": "Daniel",
+    "valor": 89.90,
+    "endereco": "Rua XV de Novembro, 123 - Curitiba",
+    "pagamento": "cartao_credito",
+    "status": "pendente"
+  }
+}
+```
 
 <img width="1919" height="867" alt="image" src="https://github.com/user-attachments/assets/f6ea1713-bb7b-49f2-bad2-ff57545b44f0" />
 
-- **GetData:** https://erp-events-functions.azurewebsites.net/api/GetData
+- **GetData:** GET https://erp-events-functions.azurewebsites.net/api/GetData/{id}
 
 <img width="1917" height="871" alt="image" src="https://github.com/user-attachments/assets/170769e1-6e75-449b-b31e-fc7f0c7544bf" />
 
@@ -64,4 +79,5 @@
 
 
 **Outubro/2025**
+
 
