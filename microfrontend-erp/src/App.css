@@ -1,0 +1,71 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #f5f7fa;
+}
+
+.App {
+  min-height: 100vh;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Status adicional para eventos */
+.status-pedido-criado,
+.status-pedido-atualizado {
+  background: #17a2b8;
+  color: white;
+}
+
+.status-pedido-cancelado {
+  background: #dc3545;
+  color: white;
+}
+
+.status-entrega-iniciada,
+.status-in-transit {
+  background: #007bff;
+  color: white;
+}
+
+.status-entrega-concluida {
+  background: #28a745;
+  color: white;
+}
+
+.status-entrega-falhou,
+.status-failed {
+  background: #dc3545;
+  color: white;
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #667eea;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #764ba2;
+}

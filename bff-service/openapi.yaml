@@ -1,0 +1,375 @@
+openapi: 3.0.3
+info:
+  title: BFF Service API
+  description: |
+    **Backend For Frontend (BFF) - Agregação e Proxy**
+    
+    O BFF atua como intermediário entre o frontend e os microservices:
+    - 🚚 **Delivery Service** (Azure SQL Server)
+    - 📦 **Orders Service** (MongoDB Atlas)
+    - ⚡ **Azure Functions** (HTTP Triggers)
+    
+    ### Funcionalidades:
+    - ✅ Agregação de dados de múltiplos serviços
+    - ✅ Proxy CRUD para todos os domínios
+    - ✅ Integração com Azure Functions
+    - ✅ CREATE via eventos
+    - ✅ Health check de todos os serviços
+    
+    Desenvolvido por: **iYoNuttxD**
+  version: 1.0.0
+  contact:
+    name: iYoNuttxD
+    url: https://github.com/iYoNuttxD
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Servidor de Desenvolvimento Local
+  - url: https://bff-service.azurewebsites.net/api/v1
+    description: Servidor de Produção (Azure)
+
+tags:
+  - name: Health
+    description: Status do BFF e serviços conectados
+  - name: Aggregation
+    description: Endpoints de agregação de dados
+  - name: Events
+    description: Integração com Azure Functions
+  - name: Delivery
+    description: Proxy para Delivery Service
+  - name: Orders
+    description: Proxy para Orders Service
+
+paths:
+  # ==================== HEALTH ====================
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check do BFF
+      description: Verifica se o BFF está operacional
+      responses:
+        '200':
+          description: BFF operacional
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: UP
+                  timestamp:
+                    type: string
+                    format: date-time
+                  service:
+                    type: string
+                    example: BFF Service
+                  version:
+                    type: string
+                    example: 1.0.0
+
+  # ==================== AGGREGATION ====================
+  /aggregation/health:
+    get:
+      tags:
+        - Aggregation
+      summary: Health check de todos os serviços
+      description: Verifica o status do BFF, Delivery Service e Orders Service
+      responses:
+        '200':
+          description: Status de todos os serviços
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  services:
+                    type: object
+                    properties:
+                      bff:
+                        type: object
+                        properties:
+                          status:
+                            type: string
+                            example: UP
+                          timestamp:
+                            type: string
+                      orders:
+                        type: object
+                        properties:
+                          status:
+                            type: string
+                            example: UP
+                          data:
+                            type: object
+                      delivery:
+                        type: object
+                        properties:
+                          status:
+                            type: string
+                            example: UP
+                          data:
+                            type: object
+
+  /aggregation/dashboard:
+    get:
+      tags:
+        - Aggregation
+      summary: Dashboard com dados agregados
+      description: Retorna dados agregados de Orders Service, Delivery Service e Azure Function
+      responses:
+        '200':
+          description: Dados agregados
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  timestamp:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      orders:
+                        type: object
+                      delivery:
+                        type: object
+                      function:
+                        type: object
+
+  /aggregation/pedido-completo/{pedidoId}:
+    get:
+      tags:
+        - Aggregation
+      summary: Buscar pedido completo com entrega
+      description: Agrega dados do pedido (Orders) com dados da entrega (Delivery)
+      parameters:
+        - name: pedidoId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Pedido completo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      pedido:
+                        type: object
+                      entregas:
+                        type: array
+                        items:
+                          type: object
+
+  /aggregation/dados-completos:
+    get:
+      tags:
+        - Aggregation
+      summary: Buscar dados completos de microservices + function
+      description: Retorna pedidos, entregas e dados da Azure Function
+      responses:
+        '200':
+          description: Dados completos agregados
+
+  # ==================== EVENTS (AZURE FUNCTIONS) ====================
+  /events/create:
+    post:
+      tags:
+        - Events
+      summary: Criar via evento (Azure Function)
+      description: |
+        Envia dados para Azure Function via HTTP Trigger.
+        A Function recebe o evento e persiste no banco de dados.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+                - data
+              properties:
+                type:
+                  type: string
+                  example: "PEDIDO_CRIADO"
+                data:
+                  type: object
+                  example:
+                    pedidoId: "123"
+                    clienteId: "456"
+      responses:
+        '201':
+          description: Evento enviado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+
+  /events/data:
+    get:
+      tags:
+        - Events
+      summary: Buscar dados da Azure Function
+      description: Busca dados processados pela Azure Function
+      responses:
+        '200':
+          description: Dados da function
+
+  /events/data/{id}:
+    get:
+      tags:
+        - Events
+      summary: Buscar dados por ID da Azure Function
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dados encontrados
+
+  # ==================== DELIVERY SERVICE PROXY ====================
+  /delivery/entregadores:
+    get:
+      tags:
+        - Delivery
+      summary: Listar entregadores (Proxy)
+      responses:
+        '200':
+          description: Lista de entregadores
+    post:
+      tags:
+        - Delivery
+      summary: Criar entregador (Proxy)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Entregador criado
+
+  /delivery/veiculos:
+    get:
+      tags:
+        - Delivery
+      summary: Listar veículos (Proxy)
+      responses:
+        '200':
+          description: Lista de veículos
+    post:
+      tags:
+        - Delivery
+      summary: Criar veículo (Proxy)
+      responses:
+        '201':
+          description: Veículo criado
+
+  /delivery/entregas:
+    get:
+      tags:
+        - Delivery
+      summary: Listar entregas (Proxy)
+      responses:
+        '200':
+          description: Lista de entregas
+    post:
+      tags:
+        - Delivery
+      summary: Criar entrega (Proxy)
+      responses:
+        '201':
+          description: Entrega criada
+
+  # ==================== ORDERS SERVICE PROXY ====================
+  /orders/clientes:
+    get:
+      tags:
+        - Orders
+      summary: Listar clientes (Proxy)
+      responses:
+        '200':
+          description: Lista de clientes
+    post:
+      tags:
+        - Orders
+      summary: Criar cliente (Proxy)
+      responses:
+        '201':
+          description: Cliente criado
+
+  /orders/restaurantes:
+    get:
+      tags:
+        - Orders
+      summary: Listar restaurantes (Proxy)
+      responses:
+        '200':
+          description: Lista de restaurantes
+    post:
+      tags:
+        - Orders
+      summary: Criar restaurante (Proxy)
+      responses:
+        '201':
+          description: Restaurante criado
+
+  /orders/pedidos:
+    get:
+      tags:
+        - Orders
+      summary: Listar pedidos (Proxy)
+      responses:
+        '200':
+          description: Lista de pedidos
+    post:
+      tags:
+        - Orders
+      summary: Criar pedido (Proxy)
+      responses:
+        '201':
+          description: Pedido criado
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            statusCode:
+              type: integer
