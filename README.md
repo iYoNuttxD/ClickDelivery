@@ -36,7 +36,7 @@
 
 - **CreateEvent:** POST https://erp-events-functions.azurewebsites.net/api/CreateEvent
 
-### **JSON utilizado para teste**
+- **JSON utilizado para teste**
 ```json
 {
   "type": "pedido_criado",
@@ -79,5 +79,6 @@
 
 
 **Outubro/2025**
+
 
 
